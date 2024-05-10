@@ -3,17 +3,30 @@ import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
 
 part "moewe_logger.dart";
+part 'moewe_config.dart';
+part 'moewe_events.dart';
+
+class AppConfig {
+  final String id;
+  final String name;
+  final Map<String, dynamic> config;
+
+  AppConfig(this.id, this.name, this.config);
+}
 
 class PushMeta {
   final String? platform;
   final String? device;
+  final String? appVersion;
 
-  const PushMeta({this.platform, this.device});
+  const PushMeta({this.platform, this.device, this.appVersion});
 
   /// getting the device type would require platform specific code
   /// and thus depend on the flutter SDK
-  factory PushMeta.fromDevice(String? model) =>
-      PushMeta(platform: Platform.operatingSystem, device: model);
+  factory PushMeta.fromDevice(String? model, String? appVersion) => PushMeta(
+      platform: Platform.operatingSystem,
+      device: model,
+      appVersion: appVersion);
 }
 
 class PushEvent {
@@ -45,12 +58,19 @@ class Moewe {
 
   /// [project] the project you want to log to
   final String project;
-  final String appId;
+  final String app;
   final String appVersion;
+  final int buildNumber;
   late PushMeta _meta;
 
   /// this logger allows you to log messages to the server
   late MoeweLogger log;
+
+  /// this allows you to configure your app at runtime
+  late MoeweConfig config;
+
+  /// allows you to log events to the server
+  late MoeweEvents event;
 
   /// creates a new instance of the moewe client
   /// [deviceModel] the model of the device you are logging from
@@ -58,20 +78,19 @@ class Moewe {
       {required this.host,
       this.port = 80,
       required this.project,
-      required this.appId,
+      required this.app,
       required this.appVersion,
+      required this.buildNumber,
       String? deviceModel}) {
-    _meta = PushMeta.fromDevice(deviceModel);
+    _meta = PushMeta.fromDevice(deviceModel, appVersion);
     log = MoeweLogger._(this);
+    config = MoeweConfig._(this);
     _i = this;
   }
 
-  /// logs an event to the server<br>
-  /// [key] this allows you to group simmilar events<br>
-  /// [data] this is the data you want to push with the event
-  /// the data can be any type that can be serialized to json
-  void event(String key, [dynamic data]) => _push('event', key, data);
-
+  /// log a crash to the server<br>
+  /// [error] the error that caused the crash<br>
+  /// [stackTrace] the stack trace of the crash
   void crash(dynamic error, StackTrace stackTrace) {
     final data = {
       'error': error.toString(),
@@ -80,15 +99,25 @@ class Moewe {
     _push('crash', 'crash', data);
   }
 
+  /// logs a feedback message to the server<br>
+  /// [title] the title of the feedback<br>
+  /// [message] the message of the feedback<br>
+  /// [type] the type of the feedback<br>
+  /// [contact] the contact of the user
+  void feedback(String title, String message, String type, String? contact) {
+    final data = {'title': title, 'message': message, 'contact': contact};
+    _push('feedback', type, data);
+  }
+
   void _push(String type, String key, dynamic data) async {
     try {
       final event = PushEvent(type, key, _meta, data);
 
-      final url = Uri.https('$host:$port', '/api/log/$project');
+      final url = Uri.https('$host:$port', '/api/use/$project/$app/log');
       final headers = {
         'Content-Type': 'application/json',
-        "MOEWE-APPID": appId,
-        "MOEWE-APPVERSION": appVersion
+        //"MOEWE-APPID": app,
+        //"MOEWE-APPVERSION": appVersion
       };
       final body = jsonEncode(event.toMap());
 
@@ -99,6 +128,23 @@ class Moewe {
       }
     } catch (e) {
       print('[moewe] failed to log event: $e');
+    }
+  }
+
+  Future<AppConfig?> _getAppConfig() async {
+    try {
+      final url = Uri.https('$host:$port', '/api/use/$project/$app/config');
+      final response = await http.get(url);
+
+      if (response.statusCode != 200) {
+        throw "Server responded with ${response.statusCode}";
+      }
+
+      final data = jsonDecode(response.body);
+      return AppConfig(data['id'], data['name'], data['config']);
+    } catch (e) {
+      print('[moewe] failed to get app config: $e');
+      return null;
     }
   }
 }
