@@ -21,7 +21,7 @@ find more information at [moewe.app](https://moewe.app)
 - includes simple UI components for simple integration
 - let users know about new app versions
 
-![](/assets/screenshots.png)
+![](assets/screenshots.png)
 
 ## usage
 
