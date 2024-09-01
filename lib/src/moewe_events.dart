@@ -1,62 +1,55 @@
 part of 'moewe.dart';
 
 class MoeweEvents {
-  final Moewe _moewe;
-  MoeweEvents._(this._moewe);
+  MoeweEvents._();
 
-  void appOpen({dynamic data}) => _moewe._push('event', 'app_open', data);
+  void appOpen({dynamic data}) => moewe.event('app_open', data: data);
 
   // ======== AUTHENTICATION ========
 
-  void login({String? method, dynamic data}) =>
-      _moewe._push('event', 'login', {...data, method});
-  void logout({dynamic data}) => _moewe._push('event', 'logout', data);
-  void register({
-    String? method,
-    dynamic data,
-  }) =>
-      _moewe._push('event', 'register', {...data, method});
-  void passwordReset({String? method, dynamic data}) =>
-      _moewe._push('event', 'password_reset', {...data, method});
-  void passwordChange({String? method, dynamic data}) =>
-      _moewe._push('event', 'password_change', {...data, method});
-  void accountDelete({String? method, dynamic data}) =>
-      _moewe._push('event', 'delete_account', {...data, method});
+  void login({String? method, JsonMap? data}) =>
+      moewe.event('auth_login', data: {...(data ?? {}), "method": method});
+  void logout({dynamic data}) => moewe.event('auth_logout', data: data);
+  void createAccount({String? method, JsonMap? data}) => moewe
+      .event('auth_account_create', data: {...(data ?? {}), "method": method});
+  void passwordReset({String? method, JsonMap? data}) => moewe
+      .event('auth_password_reset', data: {...(data ?? {}), "method": method});
+  void passwordChange({String? method, JsonMap? data}) => moewe
+      .event('auth_password_change', data: {...(data ?? {}), "method": method});
+  void accountDelete({String? method, JsonMap? data}) => moewe
+      .event('auth_account_delete', data: {...(data ?? {}), "method": method});
 
   // ======== CONTENT ========
-  void search({String? query, dynamic data}) =>
-      _moewe._push('event', 'search', {...data, "query": query});
+  void search({String? query, JsonMap? data}) =>
+      moewe.event('search', data: {...(data ?? {}), "query": query});
 
   // ======== PURCHASES ========
 
-  void purchase({String? itemId, String? price, dynamic data}) => _moewe
-      ._push('event', 'purchase', {...data, "item_id": itemId, "price": price});
+  void purchase({String? itemId, String? price, dynamic data}) => moewe._push(
+      'event',
+      'purchase',
+      {...(data ?? {}), "item_id": itemId, "price": price});
 
   // ======== GAME ========
 
-  void tutorialStart({dynamic data}) =>
-      _moewe._push('event', 'tutorial_start', data);
-  void levelStart({String? levelId, dynamic data}) =>
-      _moewe._push('event', 'level_start', {...data, "level_id": levelId});
-  void levelComplete({String? levelId, dynamic data}) =>
-      _moewe._push('event', 'level_complete', {...data, "level_id": levelId});
-  void levelFailed({String? levelId, dynamic data}) =>
-      _moewe._push('event', 'level_failed', {...data, "level_id": levelId});
-  void achievement({String? achivementId, dynamic data}) => _moewe
-      ._push('event', 'achievement', {...data, "achievement_id": achivementId});
+  void tutorialStart({JsonMap? data}) =>
+      moewe.event('tutorial_start', data: data);
+  void levelStart({String? levelId, JsonMap? data}) =>
+      moewe.event('level_start', data: {...(data ?? {}), "level_id": levelId});
+  void levelComplete({String? levelId, JsonMap? data}) => moewe
+      .event('level_complete', data: {...(data ?? {}), "level_id": levelId});
+  void levelFailed({String? levelId, JsonMap? data}) =>
+      moewe.event('level_failed', data: {...(data ?? {}), "level_id": levelId});
+  void achievement({String? achivementId, JsonMap? data}) =>
+      moewe.event('achievement',
+          data: {...(data ?? {}), "achievement_id": achivementId});
 
   // ======== SOCIAL ========
 
-  void share({String? item, String? method, dynamic data}) =>
-      _moewe._push('event', 'share', {...data, "item": item, "method": method});
-  void invite({String? method, dynamic data}) =>
-      _moewe._push('event', 'invite', data);
-  void rate({String? item, required int rating, dynamic data}) => _moewe
-      ._push('event', 'rating', {...data, "item": item, "rating": rating});
-
-  /// logs an event to the server<br>
-  /// [key] this allows you to group simmilar events<br>
-  /// [data] this is the data you want to push with the event
-  /// the data can be any type that can be serialized to json
-  void custom(String key, {dynamic data}) => _moewe._push('event', key, data);
+  void share({String? item, String? method, JsonMap? data}) => moewe
+      .event('share', data: {...(data ?? {}), "item": item, "method": method});
+  void invite({String? method, JsonMap? data}) =>
+      moewe.event('invite', data: data);
+  void rate({String? item, required int rating, JsonMap? data}) => moewe
+      .event('rating', data: {...(data ?? {}), "item": item, "rating": rating});
 }

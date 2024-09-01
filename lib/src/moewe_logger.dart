@@ -1,8 +1,7 @@
 part of 'moewe.dart';
 
 class MoeweLogger {
-  final Moewe _moewe;
-  MoeweLogger._(this._moewe);
+  MoeweLogger._();
 
   /// logs a debug message to the server and prints it to the console
   void debug(String msg) => _log("debug", msg);
@@ -21,6 +20,6 @@ class MoeweLogger {
 
   void _log(String lvl, String msg) {
     print("[MOEWE] LOG: $lvl: $msg");
-    _moewe._push('log', lvl, {msg: msg});
+    moewe._push('log', lvl, {msg: msg});
   }
 }

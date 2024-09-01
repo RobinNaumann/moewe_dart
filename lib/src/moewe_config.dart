@@ -1,14 +1,26 @@
 part of 'moewe.dart';
 
 class MoeweConfig {
-  final Moewe _moewe;
   AppConfig? _config;
 
-  init() async {
-    _config = await _moewe._getAppConfig();
+  /// initializes the config
+  /// this method should be called before using any other methods
+  /// if [timeout] is true, the method will timeout after 1 second
+  /// and return null. this is so that the app does not hang if the
+  /// server is not reachable. You can override this by setting
+  /// [timeout] to false
+  Future<void> init({bool timeout = true}) async {
+    try {
+      _config = timeout
+          ? await moewe._getAppConfig().timeout(const Duration(seconds: 1))
+          : await moewe._getAppConfig();
+    } catch (e) {
+      print("[MOEWE] Could not fetch app config. \n"
+          "if this is a timeout, you can disable it by calling `init(timeout: false)`");
+    }
   }
 
-  MoeweConfig._(this._moewe);
+  MoeweConfig._();
 
   /// checks if the current version is the latest version of the app
   /// if the version could not be determined, null is returned
@@ -16,8 +28,9 @@ class MoeweConfig {
   ///
   /// **make sure to call (and `await`) `init()` before using this**
   bool? isLatestVersion() {
+    if (moewe.buildNumber == null) return null;
     final v = int.tryParse(flagString("version")?.split("+").lastOrNull ?? "ü");
-    return v == null ? null : v == _moewe.buildNumber;
+    return v == null ? null : v <= (moewe.buildNumber ?? 0);
   }
 
   /// returns the name of the app
