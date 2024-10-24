@@ -1,8 +1,8 @@
 # **mœwe** | dart client
 
-this is a **development preview** of the dart `moewe` client.
+<img src="https://raw.githubusercontent.com/RobinNaumann/moewe_dart/main/assets/moewe_logo.png" width="100px">
 
-moewe is a open source, privacy preserving crash logging service that can be self-hosted.
+moewe _(german for seagull 🐣)_ is a open source, privacy preserving crash logging service that can be self-hosted.
 
 ## motivation
 
@@ -21,7 +21,7 @@ find more information at [moewe.app](https://moewe.app)
 - includes simple UI components for simple integration
 - let users know about new app versions
 
-![](assets/screenshots.png)
+<img src="https://raw.githubusercontent.com/RobinNaumann/moewe_dart/main/assets/screenshots.png">
 
 ## usage
 

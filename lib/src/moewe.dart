@@ -1,9 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io' show Platform;
-import 'dart:ui';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 part "crash/crash_logged.dart";
@@ -73,6 +72,7 @@ class Moewe {
   String? _appVersion;
   int? _buildNumber;
   late PushMeta _meta;
+  bool sendIfDebug;
 
   String? get appVersion => _appVersion;
   int? get buildNumber => _buildNumber;
@@ -87,12 +87,15 @@ class Moewe {
   final MoeweEvents events = MoeweEvents._();
 
   /// creates a new instance of the moewe client
-  /// [deviceModel] the model of the device you are logging from
+  /// [deviceModel] the model of the device you are logging from.
+  /// [appVersion] the version of the app you are logging from.
+  /// [sendIfDebug] if true, events will be sent even if the app is in debug mode
   Moewe(
       {required this.host,
       this.port = 80,
       required this.project,
       required this.app,
+      this.sendIfDebug = false,
       String? appVersion,
       int? buildNumber,
       String? deviceModel}) {
@@ -168,6 +171,10 @@ class Moewe {
   /// send a message without waiting for a response or confirmation
   void _push(String type, String key, JsonMap data) async {
     try {
+      if (kDebugMode && !sendIfDebug) {
+        print('[moewe] [APP IN DEBUG] not pushing: $type $key $data');
+        return;
+      }
       await _send(type, key, data);
     } catch (e) {
       print('[moewe] failed to log event: $e');
