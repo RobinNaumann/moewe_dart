@@ -11,9 +11,15 @@ class MoeweConfig {
   /// [timeout] to false
   Future<void> init({bool timeout = true}) async {
     try {
-      _config = timeout
+      var config = timeout
           ? await moewe._getAppConfig().timeout(const Duration(seconds: 1))
           : await moewe._getAppConfig();
+
+      // merge the debug config overrides
+      if (moewe._isDebug) {
+        config?.config.addAll(moewe.debugConfigOverrides ?? {});
+      }
+      _config = config;
     } catch (e) {
       print("[MOEWE] Could not fetch app config. \n"
           "if this is a timeout, you can disable it by calling `init(timeout: false)`");

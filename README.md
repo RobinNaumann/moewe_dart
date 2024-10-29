@@ -51,7 +51,7 @@ moewe.log.debug("this is a debug message");
 moewe.crash("an error occurred", null);
 
 // report user feedback
-showFeedbackPage(...)  // use package UI
+MoeweFeedbackPage.show(...)  // use package UI
 moewe.feedback(...);   // manually
 
 // get flag value from server

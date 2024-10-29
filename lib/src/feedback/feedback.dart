@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:moewe/moewe.dart';
-import 'package:moewe/src/ui/m_ui.dart';
 
 export '../ui/p_feedback.dart';
 
@@ -9,13 +8,13 @@ export '../ui/p_feedback.dart';
 /// For i18n, you can pass a [labels] object.
 /// For theming, you can pass a [theme] object. This also allows you to
 /// adapt to dark mode.
-showFeedbackPage(BuildContext context,
+@Deprecated('Use MoeweFeedbackPage.show() instead')
+void showFeedbackPage(BuildContext context,
     {MoeweTheme theme = const MoeweTheme(),
     FeedbackLabels labels = const FeedbackLabels()}) {
-  Navigator.of(context).push(MaterialPageRoute(
-      fullscreenDialog: true,
-      builder: (builder) => MoeweFeedbackPage(
-            theme: theme,
-            labels: labels,
-          )));
+  MoeweFeedbackPage.show(
+    context,
+    theme: theme,
+    labels: labels,
+  );
 }

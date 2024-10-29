@@ -1,6 +1,6 @@
 name: moewe
 description: a client library for mœwe
-version: 0.2.4
+version: 0.2.7
 repository: https://github.com/RobinNaumann/moewe_dart
 
 environment:
@@ -15,5 +15,5 @@ dependencies:
   # path: ^1.8.0
 
 dev_dependencies:
-  lints: ^2.0.0
+  lints: ^5.0.0
   test: ^1.21.0

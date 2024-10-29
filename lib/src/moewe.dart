@@ -72,7 +72,16 @@ class Moewe {
   String? _appVersion;
   int? _buildNumber;
   late PushMeta _meta;
+
+  // debug information
   bool sendIfDebug;
+
+  /// this JsonMap allows you to override the config of the app
+  /// when in debug mode. In this case, moewe will replace the values fetched
+  /// from the server with the values in this map. This does not affect release
+  /// builds.
+  /// for example, add a `version` entry to override and test update checks
+  JsonMap? debugConfigOverrides = {};
 
   String? get appVersion => _appVersion;
   int? get buildNumber => _buildNumber;
@@ -90,18 +99,23 @@ class Moewe {
   /// [deviceModel] the model of the device you are logging from.
   /// [appVersion] the version of the app you are logging from.
   /// [sendIfDebug] if true, events will be sent even if the app is in debug mode
-  Moewe(
-      {required this.host,
-      this.port = 80,
-      required this.project,
-      required this.app,
-      this.sendIfDebug = false,
-      String? appVersion,
-      int? buildNumber,
-      String? deviceModel}) {
+  Moewe({
+    required this.host,
+    this.port = 80,
+    required this.project,
+    required this.app,
+    this.sendIfDebug = false,
+    this.debugConfigOverrides,
+    String? appVersion,
+    int? buildNumber,
+    String? deviceModel,
+  }) {
     setAppVersion(appVersion, buildNumber);
     _i = this;
   }
+
+  bool get _isDebug => kDebugMode;
+  bool get _shouldSend => !_isDebug || sendIfDebug;
 
   setAppVersion(String? version, int? buildNumber) {
     _appVersion = version;
@@ -171,7 +185,7 @@ class Moewe {
   /// send a message without waiting for a response or confirmation
   void _push(String type, String key, JsonMap data) async {
     try {
-      if (kDebugMode && !sendIfDebug) {
+      if (!_shouldSend) {
         print('[moewe] [APP IN DEBUG] not pushing: $type $key $data');
         return;
       }

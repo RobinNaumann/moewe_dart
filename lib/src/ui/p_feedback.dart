@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:moewe/moewe.dart';
-import 'package:moewe/src/ui/m_ui.dart';
 
 class FeedbackType {
   final String key;
@@ -46,11 +45,28 @@ class MoeweFeedbackPage extends StatefulWidget {
   final MoeweTheme theme;
   final FeedbackLabels labels;
 
+  /// make sure a `ScaffoldMessenger` is present in the context.
+  /// This is required for showing the toast messages. If you are using
+  /// the `show(...)` function, this is handled for you.
   const MoeweFeedbackPage({
     super.key,
     this.theme = const MoeweTheme(),
     this.labels = const FeedbackLabels(),
   });
+
+  /// navigates to the feedback page (using the Flutter Navigator)
+  /// and allows the user to send feedback. For i18n, you can pass a [labels]
+  /// object. For theming, you can pass a [theme] object.
+  ///
+  /// This automatically provides a `ScaffoldMessenger` for you.
+  static void show(BuildContext context,
+      {MoeweTheme theme = const MoeweTheme(),
+      FeedbackLabels labels = const FeedbackLabels()}) {
+    Navigator.of(context).push(MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (builder) => ScaffoldMessenger(
+            child: MoeweFeedbackPage(theme: theme, labels: labels))));
+  }
 
   @override
   createState() => _State();
@@ -143,6 +159,8 @@ class _State extends State<MoeweFeedbackPage> {
 
   @override
   Widget build(BuildContext context) {
+    final canPop = Navigator.canPop(context);
+
     return Theme(
       data: (t.darkTheme ? ThemeData.dark() : ThemeData.light()).copyWith(
         canvasColor: backColor,
@@ -172,12 +190,16 @@ class _State extends State<MoeweFeedbackPage> {
       ),
       child: Scaffold(
           appBar: AppBar(
-              leading: Navigator.canPop(context)
-                  ? IconButton(
-                      icon: Icon(Icons.close),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
+              leadingWidth: canPop ? (rem(t.backButtonOffset + 3.5)) : null,
+              leading: canPop
+                  ? Padding(
+                      padding: EdgeInsets.only(left: rem(t.backButtonOffset)),
+                      child: IconButton(
+                        icon: Icon(Icons.close),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
                     )
                   : null,
               title: Text(

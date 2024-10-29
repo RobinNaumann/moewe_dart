@@ -3,10 +3,10 @@ import 'package:moewe/moewe.dart';
 
 void main() async {
   await Moewe(
-          host: "open.moewe.app",
-          project: "112dfa10cc07b914",
-          app: "eddfa4d773c53ed5")
-      .init();
+      host: "open.moewe.app",
+      project: "112dfa10cc07b914",
+      app: "eddfa4d773c53ed5",
+      debugConfigOverrides: {"fav_food": "pizza"}).init();
 
   moewe.setAppVersion("1.0.0", 0);
 
@@ -80,7 +80,7 @@ class _HomePageState extends State<HomePage> {
                       label: "give feedback",
                       icon: Icons.messageSquare,
                       onTap: () {
-                        showFeedbackPage(context);
+                        MoeweFeedbackPage.show(context);
                       },
                     ),
                     const Spaced.vertical(1),
