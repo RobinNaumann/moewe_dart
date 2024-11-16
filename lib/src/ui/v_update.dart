@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:moewe/moewe.dart';
-import 'package:moewe/src/ui/m_ui.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 /// if there is a newer version of the app available, this view is shown
@@ -15,6 +14,14 @@ class MoeweUpdateView extends StatefulWidget {
   final String message;
   final String? url;
 
+  /// externally manage the state of the view
+  /// use this in combination with [onClosed].
+  /// If it is null, the view will manage its own state.
+  final bool? isClosed;
+
+  /// called when the view is closed
+  final Function()? onClosed;
+
   const MoeweUpdateView(
       {super.key,
       this.theme = const MoeweTheme(),
@@ -22,7 +29,9 @@ class MoeweUpdateView extends StatefulWidget {
       this.closeable = true,
       this.title = "a new version is available",
       this.message = "get the newest features",
-      this.url});
+      this.url,
+      this.isClosed,
+      this.onClosed});
 
   @override
   createState() => _State();
@@ -34,7 +43,7 @@ class _State extends State<MoeweUpdateView> {
   @override
   Widget build(BuildContext context) {
     final bool up = moewe.config.isLatestVersion() ?? true;
-    return up || closed
+    return moewe.storeManaged || up || (widget.isClosed ?? closed)
         ? SizedBox()
         : Material(
             child: GestureDetector(
@@ -67,7 +76,10 @@ class _State extends State<MoeweUpdateView> {
                     SizedBox(width: widget.theme.remSize / 2),
                     if (widget.closeable)
                       IconButton(
-                          onPressed: () => setState(() => closed = true),
+                          onPressed: () {
+                            widget.onClosed?.call();
+                            setState(() => closed = true);
+                          },
                           icon: Icon(Icons.close,
                               color: widget.theme.colorOnAccent)),
                   ],

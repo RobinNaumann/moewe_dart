@@ -68,12 +68,21 @@ class Moewe {
 
   /// [project] the project you want to log to
   final String project;
+
+  /// [app] the app within the [project]
   final String app;
   String? _appVersion;
   int? _buildNumber;
   late PushMeta _meta;
 
-  // debug information
+  /// indicates whether the app (and updates) are managed by an
+  /// external service. Examples are the Google Play Store or the Apple App Store.
+  ///
+  /// If [storeManaged] is set to true, the app won't display messages
+  /// when updates become available.
+  bool storeManaged;
+
+  /// if true, events will be sent even if the app is in debug mode
   bool sendIfDebug;
 
   /// this JsonMap allows you to override the config of the app
@@ -105,6 +114,7 @@ class Moewe {
     required this.project,
     required this.app,
     this.sendIfDebug = false,
+    this.storeManaged = false,
     this.debugConfigOverrides,
     String? appVersion,
     int? buildNumber,
