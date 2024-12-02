@@ -404,10 +404,10 @@
       "languageVersion": "3.1"
     }
   ],
-  "generated": "2024-10-29T16:23:53.122958Z",
+  "generated": "2024-11-16T12:26:43.545954Z",
   "generator": "pub",
-  "generatorVersion": "3.5.3",
+  "generatorVersion": "3.5.4",
   "flutterRoot": "file:///Users/robin/development/flutter",
-  "flutterVersion": "3.24.3",
+  "flutterVersion": "3.24.4",
   "pubCache": "file:///Users/robin/.pub-cache"
 }

@@ -21,16 +21,26 @@ class AppConfig {
 class PushMeta {
   final String? platform;
   final String? device;
-  final String? appVersion;
+  final String? version;
+  final int? buildnr;
 
-  const PushMeta({this.platform, this.device, this.appVersion});
+  const PushMeta({this.platform, this.device, this.version, this.buildnr});
 
   /// getting the device type would require platform specific code
   /// and thus depend on the flutter SDK
-  factory PushMeta.fromDevice(String? model, String? appVersion) => PushMeta(
-      platform: Platform.operatingSystem,
-      device: model,
-      appVersion: appVersion);
+  factory PushMeta.fromDevice(String? model, String? version, int? buildNr) =>
+      PushMeta(
+          platform: Platform.operatingSystem,
+          device: model,
+          version: version,
+          buildnr: buildNr);
+
+  JsonMap get map => {
+        'version': version,
+        'buildnr': buildnr,
+        'platform': platform,
+        'device': device,
+      };
 }
 
 typedef JsonMap = Map<String, dynamic>;
@@ -43,12 +53,8 @@ class PushEvent {
 
   const PushEvent(this.type, this.key, this.meta, this.data);
 
-  Map<String, dynamic> toMap() => {
-        'type': type,
-        'key': key,
-        'meta': {'platform': meta.platform, 'device': meta.device},
-        'data': data
-      };
+  Map<String, dynamic> toMap() =>
+      {'type': type, 'key': key, 'meta': meta.map, 'data': data};
 }
 
 /// a shorthand for `Moewe.i`
@@ -130,7 +136,8 @@ class Moewe {
   setAppVersion(String? version, int? buildNumber) {
     _appVersion = version;
     _buildNumber = buildNumber;
-    _meta = PushMeta.fromDevice(Platform.operatingSystem, appVersion);
+    _meta =
+        PushMeta.fromDevice(Platform.operatingSystem, appVersion, buildNumber);
   }
 
   void crashHandlerInit() {
